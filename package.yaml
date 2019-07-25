@@ -24,6 +24,11 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+    - -Wall
+    - -Wextra
+  dependencies:
+    - text
 
 executables:
   Main:
@@ -33,8 +38,11 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Wextra
     dependencies:
     - TestMatch
+    - text
 
 tests:
   TestMatch-test:
