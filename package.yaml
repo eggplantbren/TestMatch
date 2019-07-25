@@ -29,6 +29,7 @@ library:
     - -Wextra
   dependencies:
     - text
+    - vector
 
 executables:
   Main:
@@ -43,6 +44,7 @@ executables:
     dependencies:
     - TestMatch
     - text
+    - vector
 
 tests:
   TestMatch-test:
