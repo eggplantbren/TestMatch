@@ -14,6 +14,6 @@ main = do
     let xs = [0..101]
     print $ map (ability player) xs
     putStrLn ""
-    print $ U.sum runProbs
+    print strikeRate
 
 
