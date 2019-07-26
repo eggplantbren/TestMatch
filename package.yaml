@@ -28,6 +28,8 @@ library:
     - -Wall
     - -Wextra
   dependencies:
+    - mwc-random
+    - primitive
     - text
     - vector
 
