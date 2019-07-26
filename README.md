@@ -7,3 +7,15 @@ undergrad.
 
 LICENSE: MIT.
 
+# Instructions
+
+1) Have [Stack](https://docs.haskellstack.org/en/stable/README/).
+2) Clone this repo
+3) Do this
+
+```
+cd TestMatch
+stack build
+stack exec Main
+```
+
