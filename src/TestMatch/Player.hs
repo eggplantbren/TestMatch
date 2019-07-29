@@ -8,6 +8,7 @@ module TestMatch.Player where
 
 -- Imports
 import qualified Data.Text as T
+import qualified Data.Vector.Unboxed as U
 
 -- The player type
 data Player =
@@ -39,4 +40,16 @@ ability Player {..} x =
 -- Hazard function
 hazard :: Player -> Int -> Double
 hazard player = (\u -> 1.0/(u + 1.0)) . ability player
+
+
+-- Probability distribution over score, up to 1000
+probabilities :: Player -> U.Vector Double
+probabilities player@(Player {..}) =
+    let
+        xs = U.generate 1001 id
+        hazards = U.map (hazard player) xs
+        complements = U.map (1.0 - ) hazards
+        cumProd = U.scanl' (*) 1.0 complements
+    in
+        U.zipWith (*) hazards cumProd
 
