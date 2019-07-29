@@ -36,3 +36,7 @@ ability Player {..} x =
         mu2 + (mu1 - mu2)*exp(-fromIntegral x/l)
 
 
+-- Hazard function
+hazard :: Player -> Int -> Double
+hazard player = (\u -> 1.0/(u + 1.0)) . ability player
+
