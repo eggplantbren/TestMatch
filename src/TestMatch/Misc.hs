@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module TestMatch.Misc where
@@ -52,16 +53,15 @@ render (Runs x) = T.pack $ case x of
     6 -> "SIX"
     _ -> "ERROR"
 
--- Simulate one ball of cricket and return the result in a PrimMonad
+-- Simulate one ball of cricket and return the result and the
+-- updated Player in a PrimMonad
 simulateBall :: PrimMonad m
-             => Player -> Gen (PrimState m) -> m BallOutcome
-simulateBall Player {..} rng = do
-
-    -- Current score
-    let x = 0
+             => Player -> Gen (PrimState m)
+             -> m (BallOutcome, Player)
+simulateBall player@(Player {..}) rng = do
 
     -- Current hazard per run
-    let h = hazard Player {..} x
+    let h = hazard Player {..}
 
     -- Current hazard per ball
     let h' = strikeRate*h
@@ -69,20 +69,29 @@ simulateBall Player {..} rng = do
     -- Test for a wicket, if no wicket, generate the number of runs
     u <- uniform rng
     if u < h'
-    then return $! Wicket
+    then return $! (Wicket, reset player)
     else do
         runs <- genRuns rng
-        return $! Runs runs
+        return $! (Runs runs, addRuns player runs)
 
 
 
 -- Simulate one ball of cricket and do some I/O about what happened.
-simulateBall' :: Player -> Gen RealWorld -> IO BallOutcome
-simulateBall' Player {..} rng = do
+simulateBall' :: Player -> Gen RealWorld -> IO (BallOutcome, Player)
+simulateBall' player rng = do
     putStr "Bowler to "
-    T.putStr name
+    T.putStr $ name player
     putStr ": "
-    result <- simulateBall Player {..} rng
-    T.putStrLn $ render result
-    return result
+    (outcome, player') <- simulateBall player rng
+    T.putStrLn $ render outcome
+    return (outcome, player')
+
+
+-- Repeat simulateBall' many times
+simulateBalls :: Player -> Int -> Gen RealWorld -> IO Player
+simulateBalls !player n rng
+    | n <= 0 = return player
+    | otherwise = do
+        (_, player') <- simulateBall' player rng
+        simulateBalls player' (n-1) rng
 
