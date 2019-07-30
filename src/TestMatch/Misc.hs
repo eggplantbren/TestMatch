@@ -5,6 +5,7 @@ module TestMatch.Misc where
 -- Imports
 import Control.Monad.Primitive
 import qualified Data.Text as T
+import qualified Data.Text.IO as T
 import qualified Data.Vector.Unboxed as U
 import System.Random.MWC
 import TestMatch.Player
@@ -45,8 +46,11 @@ render Wicket = T.pack "OUT"
 render (Runs x) = T.pack $ case x of
     0 -> "no run"
     1 -> "one run"
-    _ -> show x ++ " runs"
-
+    2 -> "two runs"
+    3 -> "three runs"
+    4 -> "FOUR"
+    6 -> "SIX"
+    _ -> "ERROR"
 
 -- Simulate one ball of cricket and return the result in a PrimMonad
 simulateBall :: PrimMonad m
@@ -62,12 +66,23 @@ simulateBall Player {..} rng = do
     -- Current hazard per ball
     let h' = strikeRate*h
 
-    -- 
+    -- Test for a wicket, if no wicket, generate the number of runs
     u <- uniform rng
-
     if u < h'
     then return $! Wicket
-    else return $! Runs 0
+    else do
+        runs <- genRuns rng
+        return $! Runs runs
 
-       
+
+
+-- Simulate one ball of cricket and do some I/O about what happened.
+simulateBall' :: Player -> Gen RealWorld -> IO BallOutcome
+simulateBall' Player {..} rng = do
+    putStr "Bowler to "
+    T.putStr name
+    putStr ": "
+    result <- simulateBall Player {..} rng
+    T.putStrLn $ render result
+    return result
 
