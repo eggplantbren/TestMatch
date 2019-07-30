@@ -20,7 +20,7 @@ runProbs = U.fromList [1.0, 0.2, 0.1, 0.03, 0.05, 0.0, 0.003]
 runProbs' :: U.Vector Double
 runProbs' = U.map (* invTot) runProbs
     where
-        invTot = 1.0/(U.sum runProbs)
+        invTot = 1.0 / U.sum runProbs
 
 -- Generate from the run probability distribution
 genRuns :: PrimMonad m => Gen (PrimState m) -> m Int
@@ -58,7 +58,7 @@ render (Runs x) = T.pack $ case x of
 simulateBall :: PrimMonad m
              => Player -> Gen (PrimState m)
              -> m (BallOutcome, Player)
-simulateBall player@(Player {..}) rng = do
+simulateBall player@Player {..} rng = do
 
     -- Current hazard per run
     let h = hazard Player {..}
@@ -69,10 +69,10 @@ simulateBall player@(Player {..}) rng = do
     -- Test for a wicket, if no wicket, generate the number of runs
     u <- uniform rng
     if u < h'
-    then return $! (Wicket, reset player)
+    then return (Wicket, reset player)
     else do
         runs <- genRuns rng
-        return $! (Runs runs, addRuns player runs)
+        return (Runs runs, addRuns player runs)
 
 
 
