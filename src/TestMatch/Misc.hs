@@ -20,6 +20,15 @@ runProbs' = U.map (* invTot) runProbs
     where
         invTot = 1.0/(U.sum runProbs)
 
+-- Generate from the run probability distribution
+genRuns :: PrimMonad m => Gen (PrimState m) -> m Int
+genRuns rng = do
+    k <- uniformR (0, U.length runProbs - 1) rng
+    u <- uniform rng
+    if u < runProbs U.! k
+    then return $! k
+    else genRuns rng
+
 -- Assumed strike rate. Eventually, should depend on the batsman
 -- and the bowler.
 strikeRate :: Double
@@ -53,7 +62,7 @@ simulateBall Player {..} rng = do
     -- Current hazard per ball
     let h' = strikeRate*h
 
-    -- Check for a dismissal
+    -- 
     u <- uniform rng
 
     if u < h'

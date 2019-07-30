@@ -44,6 +44,8 @@ executables:
     - -Wall
     - -Wextra
     dependencies:
+    - mwc-random
+    - primitive
     - TestMatch
     - text
     - vector
